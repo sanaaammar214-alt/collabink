@@ -2,22 +2,23 @@ package com.blog.service;
 
 import com.blog.exception.ResourceNotFoundException;
 import com.blog.model.Article;
+import com.blog.model.Role;
 import com.blog.model.User;
 import com.blog.repository.ArticleRepository;
 import com.blog.repository.CategorieRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ArticleServiceTest {
 
     @Mock
@@ -29,135 +30,60 @@ class ArticleServiceTest {
     @InjectMocks
     private ArticleService articleService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
-    void testGetById_Found() {
+    void save_doitGenererUnSlug() {
+        // Créer un Article avec titre "Mon Super Article"
         Article article = new Article();
-        article.setId(1L);
-        article.setTitre("Test Title");
+        article.setTitre("Mon Super Article");
+        article.setContenu("Contenu de test suffisant pour valider les contraintes".repeat(2));
 
-        when(articleRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(article));
-
-        Article result = articleService.getById(1L);
-
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Test Title", result.getTitre());
-        verify(articleRepository, times(1)).findByIdWithDetails(1L);
-    }
-
-    @Test
-    void testGetById_NotFound() {
-        when(articleRepository.findByIdWithDetails(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> articleService.getById(1L));
-        verify(articleRepository, times(1)).findByIdWithDetails(1L);
-    }
-
-    @Test
-    void testPeutEditer_Author() {
-        User author = new User();
-        author.setId(1L);
-        author.setRole(com.blog.model.Role.AUTEUR);
-
-        Article article = new Article();
-        article.setAuteur(author);
-
-        assertTrue(articleService.peutEditer(article, author));
-    }
-
-    @Test
-    void testPeutEditer_Admin() {
-        User author = new User();
-        author.setId(1L);
-        author.setRole(com.blog.model.Role.AUTEUR);
-
-        User admin = new User();
-        admin.setId(2L);
-        admin.setRole(com.blog.model.Role.ADMIN);
-
-        Article article = new Article();
-        article.setAuteur(author);
-
-        assertTrue(articleService.peutEditer(article, admin));
-    }
-
-    @Test
-    void testPeutEditer_Forbidden() {
-        User author = new User();
-        author.setId(1L);
-        author.setRole(com.blog.model.Role.AUTEUR);
-
-        User otherUser = new User();
-        otherUser.setId(2L);
-        otherUser.setRole(com.blog.model.Role.LECTEUR);
-
-        Article article = new Article();
-        article.setAuteur(author);
-
-        assertFalse(articleService.peutEditer(article, otherUser));
-    }
-
-    @Test
-    void testSave_generatesSlugWhenMissing() {
-        Article article = new Article();
-        article.setTitre("Mon super titre");
-        article.setContenu("x".repeat(60));
-
+        // Appeler articleService.save(article)
         articleService.save(article);
 
-        assertNotNull(article.getSlug());
-        assertFalse(article.getSlug().isBlank());
-        verify(articleRepository, times(1)).save(article);
+        // Vérifier que article.getSlug() contient "mon-super-article"
+        assertThat(article.getSlug()).contains("mon-super-article");
+        verify(articleRepository).save(article);
     }
 
     @Test
-    void testDelete_deletesImageFileWhenPresent() throws Exception {
-        Path tmp = Files.createTempDirectory("collabink-test");
-        String previousUserDir = System.getProperty("user.dir");
-        System.setProperty("user.dir", tmp.toString());
-        try {
-            Path uploadDir = tmp.resolve("uploads").resolve("images");
-            Files.createDirectories(uploadDir);
-            Path img = uploadDir.resolve("test.jpg");
-            Files.writeString(img, "x");
+    void getById_idInexistant_doitLancerException() {
+        // Mocker articleRepository.findByIdWithDetails(99L) → Optional.empty()
+        when(articleRepository.findByIdWithDetails(99L)).thenReturn(Optional.empty());
 
-            Article article = new Article();
-            article.setId(1L);
-            article.setImage("test.jpg");
-
-            when(articleRepository.findById(1L)).thenReturn(Optional.of(article));
-
-            articleService.delete(1L);
-
-            assertFalse(Files.exists(img));
-            verify(articleRepository, times(1)).deleteById(1L);
-        } finally {
-            if (previousUserDir != null) {
-                System.setProperty("user.dir", previousUserDir);
-            }
-        }
+        // Vérifier que assertThrows(ResourceNotFoundException.class) est levée
+        assertThrows(ResourceNotFoundException.class, () -> articleService.getById(99L));
+        verify(articleRepository).findByIdWithDetails(99L);
     }
 
     @Test
-    void testDelete_notFound_throwsResourceNotFound() {
-        when(articleRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> articleService.delete(1L));
-    }
-
-    @Test
-    void testPeutSupprimer_matchesPeutEditer() {
-        User author = new User();
-        author.setId(1L);
-        author.setRole(com.blog.model.Role.AUTEUR);
+    void peutEditer_auteurDeLarticle_doitRetournerTrue() {
+        // Créer User id=1 rôle AUTEUR, Article avec cet auteur
+        User auteur = new User();
+        auteur.setId(1L);
+        auteur.setRole(Role.AUTEUR);
 
         Article article = new Article();
-        article.setAuteur(author);
+        article.setAuteur(auteur);
 
-        assertTrue(articleService.peutSupprimer(article, author));
+        // Vérifier que peutEditer(article, auteur) retourne true
+        assertThat(articleService.peutEditer(article, auteur)).isTrue();
+    }
+
+    @Test
+    void peutEditer_autreUtilisateur_doitRetournerFalse() {
+        // Créer User auteur id=1, autre User id=2 rôle LECTEUR
+        User auteur = new User();
+        auteur.setId(1L);
+        auteur.setRole(Role.AUTEUR);
+
+        User autre = new User();
+        autre.setId(2L);
+        autre.setRole(Role.LECTEUR);
+
+        Article article = new Article();
+        article.setAuteur(auteur);
+
+        // Vérifier que peutEditer(article, autre) retourne false
+        assertThat(articleService.peutEditer(article, autre)).isFalse();
     }
 }

@@ -3,6 +3,7 @@ package com.blog.service;
 import com.blog.exception.ResourceNotFoundException;
 import com.blog.model.Article;
 import com.blog.model.Categorie;
+import com.blog.model.Role;
 import com.blog.model.User;
 import com.blog.repository.ArticleRepository;
 import com.blog.repository.CategorieRepository;
@@ -30,6 +31,13 @@ public class ArticleService {
         return sanitizeImages(articleRepository.findAllWithDetails());
     }
 
+    /**
+     * Récupère les articles avec pagination pour éviter le problème N+1 Hibernate.
+     * Utilise LEFT JOIN FETCH pour charger les associations.
+     * @param page numéro de page (commence à 0)
+     * @param size nombre d'articles par page
+     * @return Page d'articles triés par date de publication décroissante
+     */
     public Page<Article> getAllPaginated(int page, int size) {
         Page<Article> result = articleRepository.findAllByOrderByDatePublicationDesc(
                 PageRequest.of(page, size, Sort.by("datePublication").descending())
@@ -60,6 +68,11 @@ public class ArticleService {
         return sanitizeImages(articleRepository.searchByKeyword(keyword));
     }
 
+    /**
+     * Persiste un article en générant automatiquement son slug si nécessaire.
+     * @param article l'article à persister (slug généré automatiquement)
+     * @throws IllegalArgumentException si titre null ou vide
+     */
     @Transactional
     public void save(Article article) {
         if (article.getSlug() == null || article.getSlug().isBlank()) {
@@ -84,13 +97,18 @@ public class ArticleService {
         articleRepository.deleteById(id);
     }
 
+    /**
+     * Vérifie si l'utilisateur peut modifier l'article.
+     * Règle : uniquement l'auteur de l'article
+     * @return true si l'utilisateur est l'auteur de l'article
+     */
     public boolean peutEditer(Article article, User user) {
-        return article.getAuteur().getId().equals(user.getId())
-                || user.getRole().name().equals("ADMIN");
+        return article.getAuteur().getId().equals(user.getId());
     }
 
     public boolean peutSupprimer(Article article, User user) {
-        return peutEditer(article, user);
+        return article.getAuteur().getId().equals(user.getId())
+                || user.getRole() == Role.ADMIN;
     }
 
     public Categorie getCategorieById(Long id) {
@@ -101,6 +119,12 @@ public class ArticleService {
         return articleRepository.countByAuteurId(auteurId);
     }
 
+    /**
+     * Analyse les catégories des articles likés par l'utilisateur,
+     * retourne des articles non encore likés dans ces catégories.
+     * @param user utilisateur connecté
+     * @return liste max 6 articles, vide si aucun like
+     */
     public List<Article> getRecommendations(User user) {
         if (user == null || user.getLikes() == null || user.getLikes().isEmpty()) {
             return List.of();
@@ -141,6 +165,11 @@ public class ArticleService {
         return article;
     }
 
+    /**
+     * Transforme "Mon Titre !" en "mon-titre-1748293847"
+     * @param titre le titre de l'article
+     * @return slug unique en minuscules avec suffixe timestamp
+     */
     private String generateSlug(String titre) {
         if (titre == null) {
             return "article-" + System.currentTimeMillis();

@@ -15,6 +15,14 @@ public class LikeService {
 
     private final LikeRepository likeRepository;
 
+    /**
+     * Logique toggle : si le like existe → supprime et retourne false.
+     * Sinon → crée et retourne true. Contrainte UNIQUE (user,article)
+     * garantie par @UniqueConstraint en base.
+     * @param user utilisateur qui like/unlike
+     * @param article article concerné
+     * @return true si liké, false si déliké
+     */
     @Transactional
     public boolean toggleLike(User user, Article article) {
         Optional<Like> existing = likeRepository.findByUserIdAndArticleId(user.getId(), article.getId());

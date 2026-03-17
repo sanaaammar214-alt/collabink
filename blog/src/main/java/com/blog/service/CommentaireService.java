@@ -7,6 +7,8 @@ import com.blog.model.User;
 import com.blog.repository.CommentaireRepository;
 import com.blog.repository.LikeCommentaireRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,11 @@ public class CommentaireService {
 
     public List<Commentaire> getByArticle(Long articleId) {
         return commentaireRepository.findTopLevelByArticleIdOrderByDateDesc(articleId);
+    }
+
+    public Page<Commentaire> getByArticlePaginated(Long articleId, int page) {
+        return commentaireRepository.findRootByArticleId(
+            articleId, PageRequest.of(page, 10));
     }
 
     @Transactional

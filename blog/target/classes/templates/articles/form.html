@@ -80,11 +80,16 @@
                    class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-1"></i> Annuler
                 </a>
-                <button type="submit" class="btn fw-bold px-4"
-                        style="background:#c9a84c;color:#111;border:none;">
-                    <i class="bi bi-check-lg me-1"></i>
-                    <span th:text="${article.id != null} ? 'Enregistrer les modifications' : 'Publier l\'article'">Publier</span>
-                </button>
+                <div class="d-flex gap-2">
+                    <button type="submit" name="statut" value="BROUILLON" class="btn btn-outline-secondary">
+                        <i class="bi bi-file-earmark me-1"></i> Sauvegarder brouillon
+                    </button>
+                    <button type="submit" name="statut" value="PUBLIE" class="btn fw-bold px-4"
+                            style="background:#c9a84c;color:#111;border:none;">
+                        <i class="bi bi-check-lg me-1"></i>
+                        <span th:text="${article.id != null} ? 'Enregistrer les modifications' : 'Publier l\'article'">Publier</span>
+                    </button>
+                </div>
             </div>
         </form>
     </div>

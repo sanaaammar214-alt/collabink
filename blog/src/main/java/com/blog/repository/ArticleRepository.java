@@ -19,6 +19,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
         LEFT JOIN FETCH a.commentaires
         LEFT JOIN FETCH a.categorie
         LEFT JOIN FETCH a.auteur
+        WHERE (a.statut = 'PUBLIE' OR a.statut IS NULL)
         ORDER BY a.datePublication DESC
         """)
     List<Article> findAllWithDetails();
@@ -42,6 +43,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
         LEFT JOIN FETCH a.commentaires
         LEFT JOIN FETCH a.categorie
         LEFT JOIN FETCH a.auteur
+        WHERE (a.statut = 'PUBLIE' OR a.statut IS NULL)
         ORDER BY SIZE(a.likes) DESC
         """)
     List<Article> findAllOrderByLikesDesc();
@@ -53,7 +55,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
         LEFT JOIN FETCH a.commentaires
         LEFT JOIN FETCH a.categorie
         LEFT JOIN FETCH a.auteur
-        WHERE a.categorie.id = :categorieId
+        WHERE a.categorie.id = :categorieId AND (a.statut = 'PUBLIE' OR a.statut IS NULL)
         ORDER BY a.datePublication DESC
         """)
     List<Article> findByCategorieIdWithDetails(Long categorieId);
@@ -77,8 +79,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
         LEFT JOIN FETCH a.commentaires
         LEFT JOIN FETCH a.categorie
         LEFT JOIN FETCH a.auteur
-        WHERE LOWER(a.titre) LIKE LOWER(CONCAT('%', :keyword, '%'))
-           OR LOWER(a.contenu) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        WHERE (LOWER(a.titre) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(a.contenu) LIKE LOWER(CONCAT('%', :keyword, '%')))
+        AND (a.statut = 'PUBLIE' OR a.statut IS NULL)
         ORDER BY a.datePublication DESC
         """)
     List<Article> searchByKeyword(String keyword);
@@ -92,6 +95,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
         LEFT JOIN FETCH a.auteur
         WHERE a.categorie.id IN :categorieIds
         AND a.id NOT IN (SELECT l.article.id FROM Like l WHERE l.user.id = :userId)
+        AND (a.statut = 'PUBLIE' OR a.statut IS NULL)
         ORDER BY a.datePublication DESC
     """)
     List<Article> findRecommendedByCategories(List<Long> categorieIds, Long userId);

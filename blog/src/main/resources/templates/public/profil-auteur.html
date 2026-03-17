@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(~{::title},~{::main})}">
+<head>
+    <title>Profil de <span th:text="${auteur.nom}">Auteur</span></title>
+</head>
+<body>
+
+<main>
+
+<!-- Page Title -->
+<div class="page-title">
+    <div class="container">
+        <h1>Profil de l'auteur</h1>
+        <nav class="breadcrumbs">
+            <ol>
+                <li><a th:href="@{/}">Accueil</a></li>
+                <li><a th:href="@{/articles}">Articles</a></li>
+                <li class="current" th:text="${auteur.nom}">Auteur</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container">
+
+        <!-- Profil Header -->
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <div style="width:120px;height:120px;background:#f0e8d0;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+                            <i class="bi bi-person-circle" style="font-size:3rem;color:#c9a84c;"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-2" th:text="${auteur.nom}">Nom de l'auteur</h3>
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        Inscrit le <span th:text="${#temporals.format(auteur.dateInscription, 'dd MMM yyyy')}">Date</span>
+                    </p>
+                    <div class="d-flex justify-content-center gap-4 text-center">
+                        <div>
+                            <div class="fw-bold fs-4" th:text="${articles.size()}">0</div>
+                            <div class="text-muted small">Articles</div>
+                        </div>
+                        <div>
+                            <div class="fw-bold fs-4" th:text="${totalLikes}">0</div>
+                            <div class="text-muted small">Likes reçus</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="ps-md-4">
+                    <h4 class="mb-3">Biographie</h4>
+                    <p class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Cet auteur partage ses connaissances et passions à travers la communauté CollabInk.
+                    </p>
+                    <hr class="my-4">
+                    <h4 class="mb-3">Statistiques</h4>
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light p-3 rounded text-center">
+                                <div class="fw-bold text-primary" th:text="${articles.size()}">0</div>
+                                <div class="small text-muted">Articles publiés</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light p-3 rounded text-center">
+                                <div class="fw-bold text-danger" th:text="${totalLikes}">0</div>
+                                <div class="small text-muted">Total likes</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light p-3 rounded text-center">
+                                <div class="fw-bold text-success" th:text="${#lists.size(articles) > 0 ? T(java.math.BigDecimal).valueOf(totalLikes).divide(T(java.math.BigDecimal).valueOf(#lists.size(articles)), 1, T(java.math.RoundingMode).HALF_UP) : 0}">0</div>
+                                <div class="small text-muted">Moyenne likes</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light p-3 rounded text-center">
+                                <div class="fw-bold text-info" th:text="${#temporals.format(auteur.dateInscription, 'yyyy')}">2024</div>
+                                <div class="small text-muted">Membre depuis</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles de l'auteur -->
+        <div class="mb-4">
+            <h4 class="mb-3">Articles publiés</h4>
+        </div>
+
+        <div class="row gy-4" th:if="${!articles.isEmpty()}">
+            <div class="col-md-6 col-lg-4" th:each="article : ${articles}">
+                <div class="card h-100 border-0 shadow-sm">
+                    <!-- Image de couverture -->
+                    <img th:if="${article.image != null and !article.image.isBlank()}"
+                         th:src="@{/uploads/images/{img}(img=${article.image})}"
+                         alt="Image article"
+                         style="width:100%;height:180px;object-fit:cover;border-radius:8px 8px 0 0;">
+                    <div th:unless="${article.image != null and !article.image.isBlank()}"
+                         style="width:100%;height:180px;background:#f0e8d0;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;">
+                        <i class="bi bi-image" style="font-size:2rem;color:#c9a84c;"></i>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge"
+                                  style="background:#c9a84c;color:#111;font-size:0.62rem;letter-spacing:0.08em;"
+                                  th:text="${article.categorie != null ? article.categorie.nom : 'Non classé'}">
+                                Catégorie
+                            </span>
+                            <small class="text-muted"
+                                   th:text="${#temporals.format(article.datePublication,'dd MMM yyyy')}">
+                                Date
+                            </small>
+                        </div>
+
+                        <h5 class="card-title" style="font-family:'EB Garamond',serif;font-size:1.2rem;line-height:1.3;">
+                            <a th:href="@{/articles/{id}(id=${article.id})}"
+                               th:text="${article.titre}"
+                               style="text-decoration:none;color:#1a1a2e;">Titre</a>
+                        </h5>
+
+                        <div class="d-flex gap-3 my-3">
+                            <div class="text-center p-2 bg-light rounded" style="min-width: 60px;">
+                                <div class="fw-bold" th:text="${article.likes.size()}">0</div>
+                                <div class="text-muted small" style="font-size: 0.7rem;">Likes</div>
+                            </div>
+                            <div class="text-center p-2 bg-light rounded" style="min-width: 60px;">
+                                <div class="fw-bold" th:text="${article.commentaires.size()}">0</div>
+                                <div class="text-muted small" style="font-size: 0.7rem;">Comments</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto">
+                            <a th:href="@{/articles/{id}(id=${article.id})}"
+                               class="btn btn-sm w-100"
+                               style="background:#c9a84c;color:#111;border:none;">
+                                <i class="bi bi-eye me-1"></i> Lire l'article
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vide -->
+        <div class="text-center py-5" th:if="${articles.isEmpty()}">
+            <div class="mb-3">
+                <i class="bi bi-journal-x" style="font-size:4rem;color:#dee2e6;"></i>
+            </div>
+            <h4>Cet auteur n'a pas encore publié d'articles</h4>
+            <p class="text-muted">Revenez bientôt pour découvrir ses publications !</p>
+            <a th:href="@{/articles}" class="btn mt-3 fw-semibold" style="background:#c9a84c;color:#111;border:none;">
+                <i class="bi bi-arrow-left me-1"></i> Voir tous les articles
+            </a>
+        </div>
+
+    </div>
+</section>
+
+</main>
+
+</body>
+</html>

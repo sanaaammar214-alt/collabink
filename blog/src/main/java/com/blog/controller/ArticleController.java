@@ -2,7 +2,9 @@ package com.blog.controller;
 
 import com.blog.exception.ResourceNotFoundException;
 import com.blog.model.Article;
+import com.blog.model.ArticleStatut;
 import com.blog.model.Commentaire;
+import com.blog.model.Role;
 import com.blog.model.User;
 import com.blog.repository.CategorieRepository;
 import com.blog.repository.UserRepository;
@@ -77,10 +79,16 @@ public class ArticleController {
 
     // ─── DETAIL ─────────────────────────────────────────────────────────────
     @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model, Principal principal) {
+    public String detail(@PathVariable Long id, 
+                        @RequestParam(defaultValue="0") int commentPage,
+                        Model model, Principal principal) {
         Article article = articleService.getById(id);
+        
+        var commentairesPage = commentaireService.getByArticlePaginated(id, commentPage);
         model.addAttribute("article", article);
-        model.addAttribute("commentaires", commentaireService.getByArticle(id));
+        model.addAttribute("commentaires", commentairesPage.getContent());
+        model.addAttribute("commentPage", commentPage);
+        model.addAttribute("totalCommentPages", commentairesPage.getTotalPages());
         model.addAttribute("nbLikes", article.getLikes().size());
         model.addAttribute("nbArticlesAuteur", articleService.countArticlesByAuteur(article.getAuteur().getId()));
 
@@ -104,6 +112,7 @@ public class ArticleController {
                        BindingResult result,
                        @RequestParam(required = false) Long categorieId,
                        @RequestParam(required = false) MultipartFile imageFile,
+                       @RequestParam(defaultValue="PUBLIE") String statut,
                        Principal principal,
                        Model model,
                        RedirectAttributes redirectAttributes) {
@@ -116,6 +125,7 @@ public class ArticleController {
             User auteur = getUser(principal);
             article.setAuteur(auteur);
             article.setDatePublication(LocalDateTime.now());
+            article.setStatut(ArticleStatut.valueOf(statut));
 
             if (categorieId != null) {
                 article.setCategorie(articleService.getCategorieById(categorieId));
@@ -157,6 +167,7 @@ public class ArticleController {
                          BindingResult result,
                          @RequestParam(required = false) Long categorieId,
                          @RequestParam(required = false) MultipartFile imageFile,
+                         @RequestParam(defaultValue="PUBLIE") String statut,
                          Principal principal,
                          Model model,
                          RedirectAttributes redirectAttributes) {
@@ -176,6 +187,7 @@ public class ArticleController {
         try {
             article.setTitre(articleUpdate.getTitre());
             article.setContenu(articleUpdate.getContenu());
+            article.setStatut(ArticleStatut.valueOf(statut));
 
             if (categorieId != null) {
                 article.setCategorie(articleService.getCategorieById(categorieId));
@@ -202,8 +214,10 @@ public class ArticleController {
     // ─── DELETE ─────────────────────────────────────────────────────────────
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id,
+                         @RequestParam(required = false) String raisonSuppression,
                          @RequestParam(required = false) String redirect,
                          Principal principal) {
+
         Article article = articleService.getById(id);
         User user = getUser(principal);
 
@@ -211,10 +225,27 @@ public class ArticleController {
             throw new AccessDeniedException("Accès refusé.");
         }
 
+        // Admin qui supprime l'article d'un autre → raison obligatoire
+        boolean isAdminSupprimantAutrui =
+                user.getRole() == Role.ADMIN &&
+                !article.getAuteur().getId().equals(user.getId());
+
+        if (isAdminSupprimantAutrui) {
+            if (raisonSuppression == null || raisonSuppression.isBlank()) {
+                // Rediriger avec erreur si raison manquante
+                return "redirect:/articles/" + id + "?erreurSuppression=true";
+            }
+            article.setRaisonSuppression(raisonSuppression);
+            articleService.save(article);
+        }
+
         articleService.delete(id);
 
         if ("mes-articles".equals(redirect)) {
             return "redirect:/articles/mes-articles";
+        }
+        if ("admin".equals(redirect)) {
+            return "redirect:/admin/articles";
         }
         return "redirect:/articles";
     }

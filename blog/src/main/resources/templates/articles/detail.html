@@ -25,6 +25,11 @@
             <span th:text="${successMessage}">Succès</span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        <div th:if="${param.erreurSuppression}" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Erreur :</strong> La raison de suppression est obligatoire pour les administrateurs.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <div class="row">
 
             <!-- Article principal -->
@@ -36,7 +41,9 @@
                               th:text="${article.categorie != null ? article.categorie.nom : 'Non classé'}">Catégorie</span>
                         <small class="text-muted">
                             <i class="bi bi-person-circle me-1"></i>
-                            <strong th:text="${article.auteur.nom}">Auteur</strong>
+                            <a th:href="@{/auteur/{id}(id=${article.auteur.id})}" style="text-decoration:none;color:inherit;">
+                                <strong th:text="${article.auteur.nom}">Auteur</strong>
+                            </a>
                         </small>
                         <small class="text-muted">
                             <i class="bi bi-calendar3 me-1"></i>
@@ -65,18 +72,79 @@
                     </div>
 
                     <!-- Actions propriétaire/admin -->
-                    <div class="d-flex gap-2 mt-4 pt-3 border-top"
-                         th:if="${currentUser != null and (currentUser.id == article.auteur.id or currentUser.role.name() == 'ADMIN')}">
-                        <a th:href="@{/articles/{id}/edit(id=${article.id})}"
-                           class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-pencil me-1"></i> Modifier l'article
-                        </a>
-                        <form th:action="@{/articles/{id}/delete(id=${article.id})}" method="post"
-                              onsubmit="return confirm('Supprimer définitivement cet article ?')">
-                            <button type="submit" class="btn btn-outline-danger btn-sm">
-                                <i class="bi bi-trash me-1"></i> Supprimer
+                    <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                        <!-- Auteur : peut modifier et supprimer -->
+                        <div th:if="${currentUser != null and currentUser.id == article.auteur.id}" class="d-flex gap-2">
+                            <a th:href="@{/articles/{id}/edit(id=${article.id})}"
+                               class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-pencil me-1"></i> Modifier l'article
+                            </a>
+                            <form th:action="@{/articles/{id}/delete(id=${article.id})}" method="post"
+                                  onsubmit="return confirm('Supprimer définitivement cet article ?')">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash me-1"></i> Supprimer
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Admin : peut seulement supprimer les articles des autres -->
+                        <div th:if="${currentUser != null and currentUser.role.name() == 'ADMIN' and currentUser.id != article.auteur.id}">
+                            <button type="button"
+                                    class="btn btn-outline-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalSuppression">
+                                <i class="bi bi-shield-exclamation me-1"></i> Supprimer (Admin)
                             </button>
-                        </form>
+                            
+                            <!-- Modal avec raison obligatoire -->
+                            <div class="modal fade" id="modalSuppression" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">
+                                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                                Confirmer la suppression
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form th:action="@{/articles/{id}/delete(id=${article.id})}" method="post">
+                                            <div class="modal-body">
+                                                <div class="alert alert-warning d-flex align-items-center">
+                                                    <i class="bi bi-info-circle me-2"></i>
+                                                    <div>
+                                                        Vous allez supprimer l'article de <strong th:text="${article.auteur.nom}"></strong>.
+                                                        Cette action est <strong>irréversible</strong>.
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="raisonSuppression" class="form-label fw-bold">
+                                                        Raison de la suppression <span class="text-danger">*</span>
+                                                    </label>
+                                                    <textarea name="raisonSuppression"
+                                                              id="raisonSuppression"
+                                                              class="form-control"
+                                                              rows="3"
+                                                              required
+                                                              placeholder="Ex: Contenu inapproprié, violation des règles, contenu dupliqué..."></textarea>
+                                                    <div class="form-text">
+                                                        Cette raison sera enregistrée pour traçabilité administrative.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    <i class="bi bi-x-lg me-1"></i> Annuler
+                                                </button>
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="bi bi-trash me-1"></i> Confirmer la suppression
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- LIKE -->
@@ -180,6 +248,27 @@
                         
                         <!-- Appel initial du fragment pour les commentaires de premier niveau -->
                         <div th:replace="~{::commentList(${commentaires}, false)}"></div>
+
+                        <!-- Pagination des commentaires -->
+                        <nav th:if="${totalCommentPages > 1}" class="mt-4">
+                            <ul class="pagination pagination-sm justify-content-center">
+                                <li class="page-item" th:class="${commentPage == 0} ? 'page-item disabled' : 'page-item'">
+                                    <a class="page-link" th:href="@{/{id}(id=${article.id},commentPage=${commentPage - 1})}">
+                                        <i class="bi bi-chevron-left"></i> Précédent
+                                    </a>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        Page <span th:text="${commentPage + 1}">1</span> sur <span th:text="${totalCommentPages}">1</span>
+                                    </span>
+                                </li>
+                                <li class="page-item" th:class="${commentPage >= totalCommentPages - 1} ? 'page-item disabled' : 'page-item'">
+                                    <a class="page-link" th:href="@{/{id}(id=${article.id},commentPage=${commentPage + 1})}">
+                                        Suivant <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
 
                         <!-- Formulaire nouveau commentaire -->
                         <div sec:authorize="isAuthenticated()">
