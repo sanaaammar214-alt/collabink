@@ -89,61 +89,10 @@
                         
                         <!-- Admin : peut seulement supprimer les articles des autres -->
                         <div th:if="${currentUser != null and currentUser.role.name() == 'ADMIN' and currentUser.id != article.auteur.id}">
-                            <button type="button"
-                                    class="btn btn-outline-danger btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalSuppression">
+                            <a th:href="@{/admin/articles/{id}/supprimer(id=${article.id})}"
+                               class="btn btn-outline-danger btn-sm">
                                 <i class="bi bi-shield-exclamation me-1"></i> Supprimer (Admin)
-                            </button>
-                            
-                            <!-- Modal avec raison obligatoire -->
-                            <div class="modal fade" id="modalSuppression" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">
-                                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
-                                                Confirmer la suppression
-                                            </h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <form th:action="@{/articles/{id}/delete(id=${article.id})}" method="post">
-                                            <div class="modal-body">
-                                                <div class="alert alert-warning d-flex align-items-center">
-                                                    <i class="bi bi-info-circle me-2"></i>
-                                                    <div>
-                                                        Vous allez supprimer l'article de <strong th:text="${article.auteur.nom}"></strong>.
-                                                        Cette action est <strong>irréversible</strong>.
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="mb-3">
-                                                    <label for="raisonSuppression" class="form-label fw-bold">
-                                                        Raison de la suppression <span class="text-danger">*</span>
-                                                    </label>
-                                                    <textarea name="raisonSuppression"
-                                                              id="raisonSuppression"
-                                                              class="form-control"
-                                                              rows="3"
-                                                              required
-                                                              placeholder="Ex: Contenu inapproprié, violation des règles, contenu dupliqué..."></textarea>
-                                                    <div class="form-text">
-                                                        Cette raison sera enregistrée pour traçabilité administrative.
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                    <i class="bi bi-x-lg me-1"></i> Annuler
-                                                </button>
-                                                <button type="submit" class="btn btn-danger">
-                                                    <i class="bi bi-trash me-1"></i> Confirmer la suppression
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
 

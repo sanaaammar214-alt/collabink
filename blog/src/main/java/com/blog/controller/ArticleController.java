@@ -13,6 +13,7 @@ import com.blog.service.CommentaireService;
 import com.blog.service.FileUploadService;
 import com.blog.service.LikeService;
 import jakarta.validation.Valid;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
@@ -79,6 +80,7 @@ public class ArticleController {
 
     // ─── DETAIL ─────────────────────────────────────────────────────────────
     @GetMapping("/{id}")
+    @Transactional
     public String detail(@PathVariable Long id, 
                         @RequestParam(defaultValue="0") int commentPage,
                         Model model, Principal principal) {

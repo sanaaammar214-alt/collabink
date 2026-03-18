@@ -9,6 +9,7 @@ import com.blog.repository.ArticleRepository;
 import com.blog.repository.CategorieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -39,11 +40,17 @@ public class ArticleService {
      * @return Page d'articles triés par date de publication décroissante
      */
     public Page<Article> getAllPaginated(int page, int size) {
-        Page<Article> result = articleRepository.findAllByOrderByDatePublicationDesc(
+        // Utiliser la méthode avec JOIN FETCH pour éviter LazyInitializationException
+        List<Article> allArticles = articleRepository.findAllWithDetailsPaginated(
                 PageRequest.of(page, size, Sort.by("datePublication").descending())
         );
-        sanitizeImages(result.getContent());
-        return result;
+        
+        // Pagination manuelle pour maintenir la compatibilité
+        int totalElements = (int) articleRepository.count();
+        
+        sanitizeImages(allArticles);
+        
+        return new PageImpl<>(allArticles, PageRequest.of(page, size), totalElements);
     }
 
     public List<Article> getAllOrderByLikes() {

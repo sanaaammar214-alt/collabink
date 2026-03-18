@@ -95,3 +95,6 @@ INSERT IGNORE INTO categorie (nom) VALUES
     ('Science'),
     ('Société'),
     ('Art & Design');
+
+-- Index full-text pour la recherche
+ALTER TABLE article ADD FULLTEXT INDEX ft_article_search (titre, contenu);

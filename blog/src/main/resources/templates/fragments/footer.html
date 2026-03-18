@@ -2,79 +2,70 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <body>
-<footer th:fragment="footer" id="footer" class="footer dark-background" style="background: #0f172a; color: #94a3b8; padding: 2.5rem 0 1.5rem 0; border-top: 1px solid rgba(255,255,255,0.05);">
+<footer th:fragment="footer" id="footer" class="footer" style="background: #0d1b2a; color: #e0e1dd; padding: 3rem 0 1.5rem 0; border-top: 1px solid #1b263b;">
     <div class="container">
         <div class="row gy-4">
-            <!-- CollabInk Brand -->
-            <div class="col-lg-3 col-md-6">
+            <!-- Résumé de l'app -->
+            <div class="col-lg-4 col-md-6">
                 <a th:href="@{/}" class="logo d-flex align-items-center mb-3">
-                    <span class="sitename" style="color: #c9a84c; font-family: 'EB Garamond', serif; font-size: 1.5rem; font-weight: 700;">CollabInk</span>
+                    <span class="sitename" style="color: #c9a84c; font-family: 'EB Garamond', serif; font-size: 1.8rem; font-weight: 700;">CollabInk</span>
                 </a>
-                <p style="font-size: 0.85rem; line-height: 1.5;">
-                    Blog collaboratif pour partager vos idées avec la communauté.
+                <p style="font-size: 0.9rem; line-height: 1.6; color: #a8b2d1; margin-bottom: 2rem;">
+                    Plateforme de blog collaboratif — rédigez, partagez et découvrez des articles sur tous les sujets.
                 </p>
-                <div class="social-links d-flex mt-3 gap-2">
-                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px; background: rgba(201,168,76,0.1); color: #c9a84c; transition: 0.3s;"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px; background: rgba(201,168,76,0.1); color: #c9a84c; transition: 0.3s;"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px; background: rgba(201,168,76,0.1); color: #c9a84c; transition: 0.3s;"><i class="bi bi-instagram"></i></a>
+                
+                <!-- Social -->
+                <div class="social-links d-flex mt-4 gap-2">
+                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px; height:36px; background: rgba(201, 168, 76, 0.1); color: #c9a84c; transition: 0.3s;"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px; height:36px; background: rgba(201, 168, 76, 0.1); color: #c9a84c; transition: 0.3s;"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px; height:36px; background: rgba(201, 168, 76, 0.1); color: #c9a84c; transition: 0.3s;"><i class="bi bi-instagram"></i></a>
                 </div>
             </div>
 
-            <!-- Navigation Rapide -->
-            <div class="col-lg-3 col-md-6">
-                <h4 style="color: #fff; font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem;">Explorer</h4>
-                <ul class="list-unstyled small">
-                    <li class="mb-2"><a th:href="@{/}" style="color: inherit; text-decoration: none; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">🏠 Accueil</a></li>
-                    <li class="mb-2"><a th:href="@{/articles}" style="color: inherit; text-decoration: none; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">📚 Tous les articles</a></li>
-                    <li class="mb-2"><a th:href="@{/articles}" style="color: inherit; text-decoration: none; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">🔥 Les plus populaires</a></li>
-                    <li class="mb-2"><a th:href="@{/categories}" style="color: inherit; text-decoration: none; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">📂 Par catégories</a></li>
+            <!-- 3 colonnes de liens -->
+            <div class="col-lg-2 col-md-6">
+                <h4 style="color: #fff; font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Explorer</h4>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a th:href="@{/}" style="color: #a8b2d1; text-decoration: none; transition: 0.3s;">Accueil</a></li>
+                    <li class="mb-2"><a th:href="@{/articles}" style="color: #a8b2d1; text-decoration: none; transition: 0.3s;">Tous les articles</a></li>
+                    <li class="mb-2"><a th:href="@{/articles?sort=likes}" style="color: #a8b2d1; text-decoration: none; transition: 0.3s;">Les plus populaires</a></li>
+                    <li class="mb-2"><a th:href="@{/categories}" style="color: #a8b2d1; text-decoration: none; transition: 0.3s;">Par catégories</a></li>
                 </ul>
             </div>
 
-            <!-- Fonctionnalités Clés -->
-            <div class="col-lg-3 col-md-6">
-                <h4 style="color: #fff; font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem;">Fonctionnalités</h4>
-                <ul class="list-unstyled small">
+            <div class="col-lg-2 col-md-6">
+                <h4 style="color: #fff; font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Fonctionnalités</h4>
+                <ul class="list-unstyled">
                     <li class="mb-2">
-                        <span style="color: #c9a84c;">✍️</span> 
-                        <a th:href="@{/articles/new}" sec:authorize="hasAnyRole('AUTEUR','ADMIN')" style="color: inherit; text-decoration: none; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'"> Rédiger un article</a>
+                        <a th:href="@{/articles/new}" sec:authorize="hasAnyRole('AUTEUR','ADMIN')" style="color: #a8b2d1; text-decoration: none; transition: 0.3s;">Rédiger un article</a>
+                        <span sec:authorize="!hasAnyRole('AUTEUR','ADMIN')" style="color: #a8b2d1;">Rédiger un article</span>
                     </li>
+                    <li class="mb-2"><span style="color: #a8b2d1;">Commentaires & likes</span></li>
+                    <li class="mb-2"><span style="color: #a8b2d1;">Recommandations perso</span></li>
                     <li class="mb-2">
-                        <span style="color: #c9a84c;">💬</span> 
-                        <span style="opacity: 0.8;"> Commentaires & likes</span>
-                    </li>
-                    <li class="mb-2">
-                        <span style="color: #c9a84c;">🎯</span> 
-                        <span style="opacity: 0.8;"> Recommandations perso</span>
-                    </li>
-                    <li class="mb-2">
-                        <span style="color: #c9a84c;">👤</span> 
-                        <a th:href="@{/articles/mes-articles}" sec:authorize="hasAnyRole('AUTEUR','ADMIN')" style="color: inherit; text-decoration: none; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'"> Mes articles</a>
+                        <a th:href="@{/articles/mes-articles}" sec:authorize="hasAnyRole('AUTEUR','ADMIN')" style="color: #a8b2d1; text-decoration: none; transition: 0.3s;">Mes articles</a>
+                        <span sec:authorize="!hasAnyRole('AUTEUR','ADMIN')" style="color: #a8b2d1;">Mes articles</span>
                     </li>
                 </ul>
             </div>
 
-            <!-- Espace Membre -->
-            <div class="col-lg-3 col-md-6">
-                <h4 style="color: #fff; font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem;">Espace Membre</h4>
-                <ul class="list-unstyled small">
+            <!-- Espace membre -->
+            <div class="col-lg-2 col-md-6">
+                <h4 style="color: #fff; font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Espace membre</h4>
+                <ul class="list-unstyled">
                     <li sec:authorize="isAnonymous()" class="mb-2">
-                        <span style="color: #c9a84c;">🔐</span> 
-                        <a th:href="@{/login}" style="color: inherit; text-decoration: none; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'"> Se connecter</a>
+                        <a th:href="@{/login}" style="color: #a8b2d1; text-decoration: none; transition: 0.3s;">Connexion</a>
                     </li>
                     <li sec:authorize="isAnonymous()" class="mb-2">
-                        <span style="color: #c9a84c;">📝</span> 
-                        <a th:href="@{/register}" style="color: inherit; text-decoration: none; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'"> Créer un compte</a>
-                    </li>
-                    <li sec:authorize="hasRole('LECTEUR')" class="mb-2">
-                        <span style="color: #c9a84c;">🎨</span> 
-                        <form th:action="@{/articles/devenir-auteur}" method="post" class="d-inline">
-                            <button type="submit" style="background:none; border:none; color: inherit; padding:0; cursor:pointer; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'"> Devenir Auteur</button>
-                        </form>
+                        <a th:href="@{/register}" style="color: #a8b2d1; text-decoration: none; transition: 0.3s;">Créer un compte</a>
                     </li>
                     <li sec:authorize="hasRole('ADMIN')" class="mb-2">
-                        <span style="color: #c9a84c;">⚙️</span> 
-                        <a th:href="@{/admin/dashboard}" style="color: inherit; text-decoration: none; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'"> Administration</a>
+                        <a th:href="@{/admin/dashboard}" style="color: #a8b2d1; text-decoration: none; transition: 0.3s;">Administration</a>
+                    </li>
+                    <li sec:authorize="isAuthenticated()" class="mb-2">
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <button type="submit" style="background: none; border: none; color: #a8b2d1; padding: 0; cursor: pointer; transition: 0.3s;">Se déconnecter</button>
+                        </form>
                     </li>
                 </ul>
             </div>
@@ -82,22 +73,42 @@
     </div>
 
     <!-- Copyright -->
-    <div class="container mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
+    <div class="container mt-4 pt-3 border-top" style="border-color: #1b263b !important;">
         <div class="row align-items-center">
             <div class="col-md-6 text-center text-md-start">
-                <p class="mb-0" style="font-size: 0.8rem; opacity: 0.7;">
-                    © 2026 <strong style="color: #c9a84c;">CollabInk</strong> — Blog collaboratif Spring Boot
+                <p class="mb-0" style="font-size: 0.85rem; color: #a8b2d1;">
+                    © 2026 CollabInk — Blog collaboratif Spring Boot
                 </p>
             </div>
             <div class="col-md-6 text-center text-md-end">
-                <ul class="list-inline mb-0" style="font-size: 0.75rem; opacity: 0.7;">
-                    <li class="list-inline-item me-3"><a href="#" style="color: inherit; text-decoration: none;">Mentions légales</a></li>
-                    <li class="list-inline-item me-3"><a th:href="@{/conditions}" style="color: inherit; text-decoration: none;">CGU</a></li>
-                    <li class="list-inline-item"><a href="#" style="color: inherit; text-decoration: none;">Contact</a></li>
+                <ul class="list-inline mb-0" style="font-size: 0.85rem;">
+                    <li class="list-inline-item me-3"><a th:href="@{/conditions}" style="color: #a8b2d1; text-decoration: none;">CGU</a></li>
+                    <li class="list-inline-item me-3"><a href="#" style="color: #a8b2d1; text-decoration: none;">Contact</a></li>
+                    <li class="list-inline-item"><a href="#" style="color: #a8b2d1; text-decoration: none;">À propos</a></li>
                 </ul>
             </div>
         </div>
     </div>
+
+    <style>
+    /* Responsive pour mobile */
+    @media (max-width: 768px) {
+        .footer .row {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Hover effects */
+    .footer a:hover {
+        color: #c9a84c !important;
+        transform: translateY(-1px);
+    }
+    
+    .footer .social-links a:hover {
+        background: rgba(201, 168, 76, 0.2) !important;
+        transform: translateY(-2px);
+    }
+    </style>
 </footer>
 </body>
 </html>

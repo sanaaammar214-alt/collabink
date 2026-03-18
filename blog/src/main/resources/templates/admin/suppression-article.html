@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supprimer l'article - Administration CollabInk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8f6f2;
+            --surface: #ffffff;
+            --border: #e0ded7;
+            --text: #1a1a2e;
+            --muted: #6b6875;
+            --accent: #c9a84c;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --serif: 'EB Garamond', serif;
+            --sans: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: var(--bg);
+            font-family: var(--sans);
+            color: var(--text);
+            margin: 0;
+            padding: 2rem 0;
+        }
+        
+        .card {
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .btn-outline-secondary {
+            border-color: var(--border);
+            color: var(--muted);
+        }
+        
+        .btn-outline-secondary:hover {
+            background: var(--surface);
+            border-color: var(--muted);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--accent);
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <!-- En-tête -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a th:href="@{/admin/articles}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Retour aux articles
+                </a>
+                <div>
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-shield-exclamation text-danger me-2"></i>
+                        Suppression d'article
+                    </h1>
+                    <p class="text-muted mb-0">Action administrative : suppression de l'article d'un autre auteur</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertes -->
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <span th:text="${errorMessage}">Erreur</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Carte de l'article à supprimer -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Article concerné
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div th:if="${article.image != null and !article.image.isBlank()}" class="mb-3">
+                                <img th:src="@{/uploads/images/{img}(img=${article.image})}" 
+                                     class="img-fluid rounded" alt="Image article">
+                            </div>
+                            <div th:unless="${article.image != null and !article.image.isBlank()}" 
+                                 class="mb-3 text-center p-4 bg-light rounded">
+                                <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h4 th:text="${article.titre}" class="text-danger mb-3">Titre article</h4>
+                            
+                            <div class="mb-3">
+                                <span class="badge bg-warning text-dark me-2" 
+                                      th:text="${article.categorie != null ? article.categorie.nom : 'Non classé'}">
+                                    Catégorie
+                                </span>
+                                <span class="badge bg-info me-2" th:text="${article.statut}">
+                                    Statut
+                                </span>
+                            </div>
+                            
+                            <p class="text-muted mb-3" 
+                               th:text="${#strings.abbreviate(article.contenu, 200)}">
+                                Extrait du contenu...
+                            </p>
+                            
+                            <div class="row text-sm">
+                                <div class="col-6">
+                                    <strong>Auteur :</strong> 
+                                    <span th:text="${article.auteur.nom}" class="text-primary">Nom auteur</span>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Date :</strong> 
+                                    <span th:text="${#temporals.format(article.datePublication, 'dd/MM/yyyy')}">Date</span>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-sm mt-2">
+                                <div class="col-6">
+                                    <strong>Likes :</strong> 
+                                    <span th:text="${article.likes.size()}">0</span>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Commentaires :</strong> 
+                                    <span th:text="${article.commentaires.size()}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire de suppression -->
+    <div class="row mt-4">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Raison de la suppression
+                    </h5>
+                </div>
+                
+                <form th:action="@{/admin/articles/{id}/supprimer-confirmer(id=${article.id})}" 
+                      method="post" class="card-body">
+                    
+                    <!-- Avertissement -->
+                    <div class="alert alert-warning d-flex align-items-start" role="alert">
+                        <i class="bi bi-info-circle me-2 mt-1"></i>
+                        <div>
+                            <strong>Attention :</strong> Vous êtes sur le point de supprimer l'article de 
+                            <strong th:text="${article.auteur.nom}">Nom auteur</strong>. 
+                            Cette action est <strong>irréversible</strong> et sera enregistrée pour traçabilité administrative.
+                        </div>
+                    </div>
+
+                    <!-- Raisons prédéfinies -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-list-check me-1"></i>
+                            Sélectionnez une raison <span class="text-danger">*</span>
+                        </label>
+                        <div class="list-group">
+                            <div th:each="raison, iterStat : ${raisonsPredefinies}" class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="raisonSuppression" 
+                                       th:id="${'raison' + iterStat.index}"
+                                       th:value="${raison}"
+                                       th:checked="${iterStat.index == 0}"
+                                       required>
+                                <label class="form-check-label d-flex align-items-center" 
+                                       th:for="${'raison' + iterStat.index}">
+                                    <i class="bi bi-circle me-2 text-muted"></i>
+                                    <span th:text="${raison}">Raison prédéfinie</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Champ "Autre" -->
+                    <div class="mb-4" id="autreRaisonField" style="display: none;">
+                        <label for="raisonAutre" class="form-label fw-bold">
+                            <i class="bi bi-pencil me-1"></i>
+                            Précisez la raison
+                        </label>
+                        <textarea name="raisonAutre" 
+                                  id="raisonAutre" 
+                                  class="form-control" 
+                                  rows="3" 
+                                  placeholder="Décrivez en détail la raison de cette suppression..."></textarea>
+                    </div>
+
+                    <!-- Confirmation finale -->
+                    <div class="alert alert-danger" role="alert">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="confirmSuppression" required>
+                            <label class="form-check-label" for="confirmSuppression">
+                                Je confirme vouloir supprimer définitivement cet article
+                            </label>
+                        </div>
+                        <small class="text-muted">
+                            En cochant cette case, j'accepte la responsabilité de cette action administrative.
+                        </small>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="d-flex gap-3 justify-content-between">
+                        <a th:href="@{/admin/articles}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x-lg me-1"></i> Annuler
+                        </a>
+                        <button type="submit" 
+                                class="btn btn-danger btn-lg"
+                                id="btnConfirmer"
+                                disabled>
+                            <i class="bi bi-trash me-1"></i> Confirmer la suppression
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations administrateur -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body py-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-shield-check text-success me-2"></i>
+                            <small class="text-muted">
+                                Action effectuée par : <strong th:text="${admin.nom}">Admin</strong> 
+                                (<span th:text="${admin.email}">email</span>)
+                            </small>
+                        </div>
+                        <small class="text-muted">
+                            <i class="bi bi-clock me-1"></i>
+                            <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy HH:mm')}">Date/heure</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gérer l'affichage du champ "Autre"
+    const radios = document.querySelectorAll('input[name="raisonSuppression"]');
+    const autreField = document.getElementById('autreRaisonField');
+    const autreTextarea = document.getElementById('raisonAutre');
+    const confirmCheckbox = document.getElementById('confirmSuppression');
+    const submitBtn = document.getElementById('btnConfirmer');
+
+    radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value.includes('Autre raison')) {
+                autreField.style.display = 'block';
+                autreTextarea.required = true;
+            } else {
+                autreField.style.display = 'none';
+                autreTextarea.required = false;
+                autreTextarea.value = '';
+            }
+        });
+    });
+
+    // Gérer l'état du bouton de confirmation
+    confirmCheckbox.addEventListener('change', function() {
+        submitBtn.disabled = !this.checked;
+    });
+});
+</script>
+</div>
+</body>
+</html>

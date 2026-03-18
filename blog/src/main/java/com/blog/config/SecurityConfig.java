@@ -61,6 +61,14 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/403")
+                )
+                // CSRF Protection : Activé par défaut pour toutes les routes web (forms POST)
+                // Empêche les attaques CSRF en exigeant un token valide pour chaque requête POST
+                // Les templates Thymeleaf incluent automatiquement le token CSRF dans les formulaires
+                .csrf(csrf -> csrf
+                        // Ignorer CSRF pour les futures routes d'API (/api/**)
+                        // Permettra les requêtes API sans token CSRF (ex: mobile apps, Postman)
+                        .ignoringRequestMatchers("/api/**")
                 );
 
         return http.build();

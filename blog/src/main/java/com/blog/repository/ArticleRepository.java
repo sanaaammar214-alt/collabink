@@ -105,4 +105,16 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     // Pagination
     Page<Article> findAllByOrderByDatePublicationDesc(Pageable pageable);
+    
+    // Pagination avec JOIN FETCH pour éviter LazyInitializationException
+    @Query("""
+        SELECT DISTINCT a FROM Article a
+        LEFT JOIN FETCH a.likes
+        LEFT JOIN FETCH a.commentaires
+        LEFT JOIN FETCH a.categorie
+        LEFT JOIN FETCH a.auteur
+        WHERE (a.statut = 'PUBLIE' OR a.statut IS NULL)
+        ORDER BY a.datePublication DESC
+        """)
+    List<Article> findAllWithDetailsPaginated(Pageable pageable);
 }

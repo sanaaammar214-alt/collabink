@@ -29,7 +29,7 @@ public class HomeController {
         model.addAttribute("categories", categorieRepository.findAll());
 
         if (principal != null) {
-            userRepository.findByEmail(principal.getName()).ifPresent(user -> {
+            userRepository.findByEmailWithLikes(principal.getName()).ifPresent(user -> {
                 model.addAttribute("recommendedArticles", articleService.getRecommendations(user));
             });
         }
