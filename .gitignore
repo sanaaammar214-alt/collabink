@@ -73,3 +73,16 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Variables d'environnement sensibles
+.env
+*.env
+
+# Fichiers de build Java
+**/target/
+**/*.class
+
+# IDE
+.idea/
+.vscode/
+*.iml

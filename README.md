@@ -38,12 +38,6 @@ mvn spring-boot:run
 
 4. Accéder à : http://localhost:8080
 
-## Comptes de test (créés automatiquement au 1er démarrage)
-| Rôle   | Email              | Mot de passe |
-|--------|--------------------|--------------|
-| ADMIN  | admin@collabink.ma | admin123     |
-| AUTEUR | sara@collabink.ma  | auteur123    |
-
 ## Fonctionnalités
 - ✅ Inscription / Connexion / Déconnexion
 - ✅ Création, modification, suppression d'articles (AUTEUR/ADMIN)
@@ -59,17 +53,10 @@ mvn spring-boot:run
 ## Structure des uploads
 Les images uploadées sont stockées dans `{user.dir}/uploads/images/` et servies via l'URL `/uploads/images/{filename}`.
 
-compte  
-Admin: admin@collabink.ma / admin123
-Auteur1: sara@collabink.ma  / auteur123
-Auteur2: sanaa@collabink.ma/ sanaa123
-Auteur3: meriem@collabink.ma/ meriem123
-Auteur4: salma@collabink.ma/ salma123
-Auteur5: oussama@collabink.ma/oussama123
-lecteur1:ahmed@collabink.ma/ahmed123
-lecteur2:ali@collabink.ma/ali123
-lecteur3:ilham@collabink.ma/ilham123
-lecteur4:badr@collabink.ma/badr123
-lecteur5:taha@collabink.ma/taha123
+## Comptes de test
 
+Les comptes de démonstration sont créés automatiquement au premier démarrage
+par le `DataInitializer`. Consultez ce fichier pour les identifiants,
+ou référez-vous au fichier `.env.example` pour la configuration.
 
+> ⚠️ Ne jamais publier de mots de passe réels dans un README public.

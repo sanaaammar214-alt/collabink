@@ -29,6 +29,7 @@ services:
       DB_USERNAME: root
       DB_PASSWORD: collabink123
       UPLOAD_DIR: uploads/images
+      DDL_AUTO: validate
     volumes:
       - uploads-data:/app/uploads
     depends_on:

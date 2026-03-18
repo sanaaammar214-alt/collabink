@@ -18,7 +18,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -142,7 +141,7 @@ public class AdminController {
         model.addAttribute("admin", admin);
         
         // Raisons prédéfinies
-        List<String> raisonsPredefinies = Arrays.asList(
+        List<String> raisonsPredefinies = List.of(
             "Contenu inapproprié ou offensant",
             "Violation des conditions d'utilisation",
             "Contenu dupliqué ou plagié",
